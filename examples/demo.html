@@ -1,0 +1,56 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Browser Test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" href="demo.css"/>
+    </head>
+
+    <body>
+        <div id="page">
+            <header class="header">
+                <h1>Toy Browser Engine</h1>
+            </header>
+            <div id="main">
+                <div id="navbar">
+                    <a href="#" class="navitem">
+                        Home
+                    </a>
+                    <a href="#" class="navitem">
+                        About
+                    </a>
+                    <a href="#" class="navitem">
+                        Some random stuff
+                    </a>
+                    <a href="#" class="navitem">
+                        Conclusion
+                    </a>
+                    <img class="img" src="images/otters.jpg"/>
+                </div>
+                <div id="content">
+                    <h2>What is this?</h2>
+                    This is a <b>toy</b> browser engine, implemented for
+                    <span>fun </span> <img class="icon" src="images/fun.png"/>
+                    and <span>glory <img class="icon" src="images/glory.png"/></span>.
+                    <h2>Why would anyone do this?</h2>
+                    This seems pretty pointless! But I had a few goals:
+                    <ul>
+                        <li>Something to build to learn C++</li>
+                        <li>Learn more about how browsers work</li>
+                        <li>Make something I've never made before</li>
+                    </ul>
+                    <h2>What can it do?</h2>
+                    <p>
+                        Currently, the engine can parse a subset of HTML
+                        and build a DOM tree. It can also parse a small subset of
+                        CSS (sometimes incorrectly) and use simple selector matching
+                        to apply styles to elements.
+                    </p>
+                    <p>
+                        It supports <em>very basic</em> rendering of boxes, images, and
+                        text with simple block and inline layouts.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
