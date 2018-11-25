@@ -24,7 +24,8 @@ void render(int width, int height, const style::StyledNode &sn,
   layout::Dimensions viewport;
   viewport.content.width = width;
   viewport.content.height = height;
-  layout::LayoutElement *layout_root = layout::layout_tree(sn, viewport);
+  std::unique_ptr<layout::LayoutElement> layout_root =
+      layout::layout_tree(sn, viewport);
   paint(*layout_root, viewport.content, window);
 }
 

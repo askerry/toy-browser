@@ -202,16 +202,16 @@ void LayoutElement::layoutChildren(int parentWidth) {
   } else {
     availableChildWidth = dimensions.content.width;
   }
-  for (auto child : children_) {
+  for (LayoutElement& child : get_children()) {
     logger::debug(absl::StrFormat("Laying out %d child #%d of %d",
-                                  child->get_display_type(), i,
+                                  child.get_display_type(), i,
                                   get_display_type()));
-    bool currElementIsBlock = isBlockLike(child->get_display_type());
-    child->calculateWidth(dimensions);
+    bool currElementIsBlock = isBlockLike(child.get_display_type());
+    child.calculateWidth(dimensions);
     // Would adding this child element to the current row put us over the
     // maximum width of the container?
     bool overflow =
-        xCursor + child->dimensions.content.width > availableChildWidth;
+        xCursor + child.dimensions.content.width > availableChildWidth;
     // Block elements, or elements following block elements, will render
     // below the previous element.
     bool shouldRenderBelow =
@@ -224,29 +224,29 @@ void LayoutElement::layoutChildren(int parentWidth) {
       xCursor = 0;
     }
     i++;
-    child->applyLayout(dimensions, xCursor, yCursor, shouldRenderBelow);
-    if (!isBlockLike(child->get_display_type())) {
+    child.applyLayout(dimensions, xCursor, yCursor, shouldRenderBelow);
+    if (!isBlockLike(child.get_display_type())) {
       // Elements can render next to rather than below an inline element so
       // we increment the xCursor
-      xCursor += child->dimensions.borderBox().width;
+      xCursor += child.dimensions.borderBox().width;
       if (get_display_type() == style::Inline ||
           (get_display_type() == style::FlexChild &&
            getStyleValue(constants::css_properties::WIDTH, "-1") == "-1")) {
-        dimensions.content.width += child->dimensions.content.width;
+        dimensions.content.width += child.dimensions.content.width;
       }
     }
     // If the element is rendering below the previous element, or is the final
     // element in its row, update the container's height
     if (shouldRenderBelow) {
-      dimensions.content.height += child->dimensions.marginBox().height;
+      dimensions.content.height += child.dimensions.marginBox().height;
     }
 
     // Parent will be at least as big as it's biggest child
-    if (child->dimensions.marginBox().height > dimensions.content.height) {
-      dimensions.content.height = child->dimensions.marginBox().height;
+    if (child.dimensions.marginBox().height > dimensions.content.height) {
+      dimensions.content.height = child.dimensions.marginBox().height;
     }
 
-    prevElementHeight = child->dimensions.marginBox().height;
+    prevElementHeight = child.dimensions.marginBox().height;
     prevElementIsBlock = currElementIsBlock;
   }
 }
@@ -263,25 +263,26 @@ BoxType parseBoxType(const std::string &tag) {
   }
 }
 
-LayoutElement *build_layout_tree(const style::StyledNode &styleTree) {
-  LayoutElement *layoutTree = new LayoutElement(
+std::unique_ptr<LayoutElement> build_layout_tree(
+    const style::StyledNode &styleTree) {
+  std::unique_ptr<LayoutElement> layoutTree(new LayoutElement(
       styleTree.get_node(), styleTree.get_style_values(),
-      styleTree.get_display_type(), parseBoxType(styleTree.get_tag()));
+      styleTree.get_display_type(), parseBoxType(styleTree.get_tag())));
   for (auto c : styleTree.get_children()) {
-    LayoutElement *childTree = build_layout_tree(c);
-    layoutTree->addChild(childTree);
+    std::unique_ptr<LayoutElement> childTree = build_layout_tree(c);
+    layoutTree->addChild(std::move(childTree));
   }
   return layoutTree;
 }
 
-LayoutElement *layout_tree(const style::StyledNode &styleTree,
-                           Dimensions container) {
+std::unique_ptr<LayoutElement> layout_tree(const style::StyledNode &styleTree,
+                                           Dimensions container) {
   logger::info("****** Building layout ******");
   // The layout algorithm expects the container height to start at 0.
   // TODO: Save the initial containing block height, for calculating percent
   // heights.
   container.content.height = 0.0;
-  LayoutElement *root = build_layout_tree(styleTree);
+  std::unique_ptr<LayoutElement> root = build_layout_tree(styleTree);
   root->applyLayout(container);
   return root;
 }

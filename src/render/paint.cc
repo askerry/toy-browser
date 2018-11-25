@@ -32,7 +32,7 @@ void Renderer::renderLayout(layout::LayoutElement &box,
     this->renderShape(box, window);
   }
   for (auto child : box.get_children()) {
-    renderLayout(*child, window);
+    renderLayout(child, window);
   }
 }
 void Renderer::renderBullet(const layout::LayoutElement &box,

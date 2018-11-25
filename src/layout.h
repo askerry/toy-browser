@@ -44,7 +44,7 @@ struct Dimensions {
 enum BoxType { Img, Text, Bullet, Shape };
 
 class LayoutElement {
-  std::vector<LayoutElement *> children_;
+  std::vector<std::unique_ptr<LayoutElement>> children_;
   std::string raw_data_;
   std::unique_ptr<sf::Text> text_node_;
   style::PropertyMap style_values_;
@@ -65,8 +65,16 @@ class LayoutElement {
   style::DisplayType get_display_type() const { return display_type_; };
   std::unique_ptr<sf::Text> take_text_node() { return std::move(text_node_); };
   const sf::Text &get_text_node() { return *text_node_; };
-  std::vector<LayoutElement *> get_children() { return children_; };
-  void addChild(LayoutElement *child) { children_.push_back(child); }
+  std::vector<std::reference_wrapper<LayoutElement>> get_children() const {
+    std::vector<std::reference_wrapper<LayoutElement>> children;
+    for (auto const &child : children_) {
+      children.push_back(*child);
+    }
+    return children;
+  };
+  void addChild(std::unique_ptr<LayoutElement> child) {
+    children_.push_back(std::move(child));
+  }
   void applyLayout(Dimensions container, int xCursor = 0, int yCursor = 0,
                    bool shouldRenderBelow = true);
   std::string getStyleValue(
@@ -76,10 +84,11 @@ class LayoutElement {
   }
 };
 
-LayoutElement *build_layout_tree(const style::StyledNode &styleTree);
+std::unique_ptr<LayoutElement> build_layout_tree(
+    const style::StyledNode &styleTree);
 
-LayoutElement *layout_tree(const style::StyledNode &styleTree,
-                           Dimensions container);
+std::unique_ptr<LayoutElement> layout_tree(const style::StyledNode &styleTree,
+                                           Dimensions container);
 }  // namespace layout
 
 #endif
