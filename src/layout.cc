@@ -27,7 +27,7 @@ void LayoutElement::setHeight() {
     dimensions.content.height = text_render::getTextHeight(this);
   } else if (getStyleValue(constants::css_properties::HEIGHT, "-1") != "-1") {
     int height = std::stoi(getStyleValue(constants::css_properties::HEIGHT));
-    this->dimensions.content.height = height;
+    dimensions.content.height = height;
   }
 }
 
@@ -202,7 +202,7 @@ void LayoutElement::layoutChildren(int parentWidth) {
   } else {
     availableChildWidth = dimensions.content.width;
   }
-  for (LayoutElement& child : get_children()) {
+  for (LayoutElement &child : get_children()) {
     logger::debug(absl::StrFormat("Laying out %d child #%d of %d",
                                   child.get_display_type(), i,
                                   get_display_type()));

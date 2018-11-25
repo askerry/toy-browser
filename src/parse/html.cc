@@ -127,7 +127,7 @@ std::string HtmlParser::parseTagName() {
 }
 
 std::vector<dom::Node *> HtmlParser::parseNodes() {
-  this->consumeWhitespace();
+  consumeWhitespace();
   std::vector<dom::Node *> nodes;
   while (!endOfInput() && !startsWith("</")) {
     consumeWhitespace();

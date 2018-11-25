@@ -9,8 +9,8 @@
  */
 class BaseParser {
  private:
-  int pos;
-  std::string input;
+  int pos_;
+  std::string input_;
 
  protected:
   // Reads the next character without consuming it.
@@ -36,8 +36,8 @@ class BaseParser {
 
  public:
   BaseParser(int pos, std::string input) {
-    this->pos = pos;
-    this->input = input;
+    pos_ = pos;
+    input_ = input;
   };
 };
 

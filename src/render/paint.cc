@@ -6,7 +6,6 @@
 
 RenderShape::~RenderShape() {
   std::cout << "Destructing render shape" << std::endl;
-  // delete color_;
 }
 
 RenderImage::~RenderImage() {
@@ -15,7 +14,6 @@ RenderImage::~RenderImage() {
 
 RenderText::~RenderText() {
   std::cout << "Destructing render text" << std::endl;
-  // delete text_node_;
 }
 
 void Renderer::renderLayout(layout::LayoutElement &box,
@@ -23,13 +21,13 @@ void Renderer::renderLayout(layout::LayoutElement &box,
   if (box.get_display_type() == style::Invisible) {
     return;
   } else if (box.get_box_type() == layout::Img) {
-    this->renderImage(box, window);
+    renderImage(box, window);
   } else if (box.get_box_type() == layout::Text) {
-    this->renderText(box, window);
+    renderText(box, window);
   } else if (box.get_box_type() == layout::Bullet) {
-    this->renderBullet(box, window);
+    renderBullet(box, window);
   } else {
-    this->renderShape(box, window);
+    renderShape(box, window);
   }
   for (auto child : box.get_children()) {
     renderLayout(child, window);
@@ -135,7 +133,7 @@ void RenderShape::log() {
 
 void paint(layout::LayoutElement &layoutRoot, layout::Rect bounds,
            sf::RenderWindow *window) {
-  logger::info("\n****** Painting canvas ******");
+  logger::info("****** Painting canvas ******");
   Renderer Renderer;
   Renderer.renderLayout(layoutRoot, window);
   window->display();

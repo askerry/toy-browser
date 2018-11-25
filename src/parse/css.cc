@@ -161,7 +161,7 @@ std::vector<Selector> CSSParser::parseSelectors() {
   while (!endOfInput()) {
     Selector s = parseSimpleSelector();
     selectors.push_back(s);
-    this->consumeWhitespace();
+    consumeWhitespace();
     char next_char = nextChar();
     if (next_char == ',') {
       consumeChar();
@@ -242,7 +242,7 @@ Selector CSSParser::parseSimpleSelector() {
   std::string id;
   std::vector<std::string> classes;
   while (!endOfInput()) {
-    this->consumeWhitespace();
+    consumeWhitespace();
     char nc = nextChar();
     if (nc == '#') {
       consumeChar();
