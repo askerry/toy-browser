@@ -14,10 +14,10 @@ namespace html_parser {
  */
 class HtmlParser : public BaseParser {
  private:
-  dom::ElementNode *parseElementNode();
+  std::unique_ptr<dom::ElementNode> parseElementNode();
   void parseComment();
   void parseSingleLineComment();
-  std::vector<dom::TextNode *> parseTextNodes();
+  std::vector<std::unique_ptr<dom::TextNode>> parseTextNodes();
   Attrs parseAttributes();
   std::pair<const std::string &, const std::string &> parseAttribute();
   std::string parseTagName();
@@ -25,12 +25,12 @@ class HtmlParser : public BaseParser {
 
  public:
   HtmlParser(int pos, const std::string &input) : BaseParser(pos, input){};
-  std::vector<dom::Node *> parseNodes();
+  std::vector<std::unique_ptr<dom::Node>> parseNodes();
 };
 
 /*
  * Entrypoint to HTML parser.
  */
-dom::Node *parseHtml(const std::string &source);
+std::unique_ptr<dom::Node> parseHtml(const std::string &source);
 }  // namespace html_parser
 #endif

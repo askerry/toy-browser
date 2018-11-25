@@ -10,23 +10,23 @@
 
 namespace html_parser {
 
-std::vector<dom::TextNode *> HtmlParser::parseTextNodes() {
-  std::vector<dom::TextNode *> nodes;
+std::vector<std::unique_ptr<dom::TextNode>> HtmlParser::parseTextNodes() {
+  std::vector<std::unique_ptr<dom::TextNode>> nodes;
   std::string text;
   while (nextChar() != '<') {
     std::string word =
         consumeWhile([](char c) { return !isspace(c) && c != '<'; });
-    dom::TextNode *node = new dom::TextNode(word);
-    nodes.push_back(node);
-    dom::TextNode *space = new dom::TextNode(" ");
-    nodes.push_back(space);
+    std::unique_ptr<dom::TextNode> node(new dom::TextNode(word));
+    nodes.push_back(std::move(node));
+    std::unique_ptr<dom::TextNode> space(new dom::TextNode(" "));
+    nodes.push_back(std::move(space));
     text += word + ' ';
     consumeWhitespace();
   };
   return nodes;
 }
 
-dom::ElementNode *HtmlParser::parseElementNode() {
+std::unique_ptr<dom::ElementNode> HtmlParser::parseElementNode() {
   // Opening tag and attributes
   assert(consumeChar() == '<');
   std::string opening_tag = parseTagName();
@@ -36,22 +36,24 @@ dom::ElementNode *HtmlParser::parseElementNode() {
   if (startsWith("/>")) {
     assert(consumeChar() == '/');
     assert(consumeChar() == '>');
-    std::vector<dom::Node *> children;
-    dom::ElementNode *node = new dom::ElementNode(opening_tag, attrs, children);
+    std::vector<std::unique_ptr<dom::Node>> children;
+    std::unique_ptr<dom::ElementNode> node(
+        new dom::ElementNode(opening_tag, attrs, std::move(children)));
     return node;
   }
   assert(consumeChar() == '>');
 
   // Parse element recursively
-  std::vector<dom::Node *> children = parseNodes();
+  std::vector<std::unique_ptr<dom::Node>> children = parseNodes();
   if (opening_tag == constants::html_tags::LI) {
     Attrs a;
-    std::vector<dom::Node *> c;
-    dom::ElementNode *bulletNode =
-        new dom::ElementNode(constants::html_tags::BULLET, a, c);
-    children.insert(children.begin(), bulletNode);
+    std::vector<std::unique_ptr<dom::Node>> c;
+    std::unique_ptr<dom::ElementNode> bulletNode(
+        new dom::ElementNode(constants::html_tags::BULLET, a, std::move(c)));
+    children.insert(children.begin(), std::move(bulletNode));
   }
-  dom::ElementNode *node = new dom::ElementNode(opening_tag, attrs, children);
+  std::unique_ptr<dom::ElementNode> node(
+      new dom::ElementNode(opening_tag, attrs, std::move(children)));
 
   // Closing tag
   assert(consumeChar() == '<');
@@ -126,9 +128,9 @@ std::string HtmlParser::parseTagName() {
   return tag;
 }
 
-std::vector<dom::Node *> HtmlParser::parseNodes() {
+std::vector<std::unique_ptr<dom::Node>> HtmlParser::parseNodes() {
   consumeWhitespace();
-  std::vector<dom::Node *> nodes;
+  std::vector<std::unique_ptr<dom::Node>> nodes;
   while (!endOfInput() && !startsWith("</")) {
     consumeWhitespace();
     if (startsWith("<!--")) {
@@ -136,12 +138,12 @@ std::vector<dom::Node *> HtmlParser::parseNodes() {
     } else if (startsWith("{#")) {
       parseSingleLineComment();
     } else if (nextChar() == '<') {
-      dom::ElementNode *next_node = parseElementNode();
-      nodes.push_back(next_node);
+      std::unique_ptr<dom::ElementNode> next_node = parseElementNode();
+      nodes.push_back(std::move(next_node));
     } else {
-      std::vector<dom::TextNode *> next_nodes = parseTextNodes();
-      for (auto n : next_nodes) {
-        nodes.push_back(n);
+      std::vector<std::unique_ptr<dom::TextNode>> next_nodes = parseTextNodes();
+      for (auto &n : next_nodes) {
+        nodes.push_back(std::move(n));
       }
     }
     consumeWhitespace();
@@ -150,9 +152,9 @@ std::vector<dom::Node *> HtmlParser::parseNodes() {
   return nodes;
 }
 
-dom::Node *parseHtml(const std::string &source) {
+std::unique_ptr<dom::Node> parseHtml(const std::string &source) {
   logger::info("****** Parsing HTML ******");
   HtmlParser parser(0, source);
-  return parser.parseNodes()[0];
+  return std::move(parser.parseNodes()[0]);
 }
 }  // namespace html_parser

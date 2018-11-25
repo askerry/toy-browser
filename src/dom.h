@@ -16,15 +16,26 @@ namespace dom {
  */
 class Node {
  private:
-  std::vector<Node *> children_;
+  std::vector<std::unique_ptr<Node>> children_;
 
  public:
   // Constructors
   Node(){};
-  Node(std::vector<Node *> children) { children_ = children; };
+  Node(std::vector<std::unique_ptr<Node>> children) {
+    children_ = std::move(children);
+  };
+  // Delete copy constructor
+  Node(const Node &node) = delete;
+  Node &operator=(const Node &node) = delete;
 
   // Getters
-  std::vector<Node *> get_children() const { return children_; };
+  std::vector<std::reference_wrapper<Node>> get_children() const {
+    std::vector<std::reference_wrapper<Node>> children;
+    for (auto const &child : children_) {
+      children.push_back(*child);
+    }
+    return children;
+  };
 
   virtual std::string toLogStr() const { return ""; };
 };
@@ -37,9 +48,11 @@ class TextNode : public Node {
 
  public:
   // Constructors
+  // Delete copy constructor
+  TextNode(const TextNode &node) = delete;
   TextNode(const std::string &text) { text_ = text; }
-  TextNode(const std::string &text, std::vector<Node *> children)
-      : Node(children) {
+  TextNode(const std::string &text, std::vector<std::unique_ptr<Node>> children)
+      : Node(std::move(children)) {
     text_ = text;
   }
   // Getters
@@ -58,13 +71,15 @@ class ElementNode : public Node {
 
  public:
   // Constructors
+  ElementNode(const ElementNode &node) = delete;
+
   ElementNode(const std::string &tag_name, Attrs attrs) {
     tag_name_ = tag_name;
     attrs_ = attrs;
   };
   ElementNode(const std::string &tag_name, Attrs attrs,
-              std::vector<Node *> children)
-      : Node(children) {
+              std::vector<std::unique_ptr<Node>> children)
+      : Node(std::move(children)) {
     tag_name_ = tag_name;
     attrs_ = attrs;
   };

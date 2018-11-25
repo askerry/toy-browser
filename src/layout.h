@@ -58,7 +58,7 @@ class LayoutElement {
 
  public:
   Dimensions dimensions;
-  LayoutElement(dom::Node *node, style::PropertyMap style_values,
+  LayoutElement(dom::Node &node, style::PropertyMap style_values,
                 style::DisplayType display_type, BoxType box_type);
   std::string get_raw_data() const { return raw_data_; };
   BoxType get_box_type() const { return box_type_; };

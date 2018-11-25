@@ -57,6 +57,9 @@ The project uses the [bazel](https://bazel.build/) build system.
 - [Abseil](https://abseil.io/) for various string operations, etc.
 - [Gflags](https://github.com/gflags/gflags)
 
+Code is formatted using clang-format in the google style. To format, run:
+clang-format style=file -i src/*.cc src/*.h src/render/* src/parse/*
+
 #### Instructions
 
 1. Install bazel and SFML (e.g. with [Homebrew](https://brew.sh/)).

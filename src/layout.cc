@@ -31,7 +31,7 @@ void LayoutElement::setHeight() {
   }
 }
 
-LayoutElement::LayoutElement(dom::Node *node, style::PropertyMap style_values,
+LayoutElement::LayoutElement(dom::Node &node, style::PropertyMap style_values,
                              style::DisplayType display_type,
                              BoxType box_type) {
   display_type_ = display_type;
@@ -39,16 +39,16 @@ LayoutElement::LayoutElement(dom::Node *node, style::PropertyMap style_values,
   style_values_ = style_values;
 
   if (display_type == style::Text) {
-    dom::TextNode *castToText = dynamic_cast<dom::TextNode *>(node);
-    if (castToText != node) {
+    dom::TextNode &castToText = dynamic_cast<dom::TextNode &>(node);
+    if (&castToText != &node) {
       logger::error("The provided node is not a text node");
     }
-    raw_data_ = castToText->get_text();
-    text_node_ = text_render::constructText(this, castToText->get_text());
+    raw_data_ = castToText.get_text();
+    text_node_ = text_render::constructText(this, castToText.get_text());
   }
   if (box_type == Img) {
-    dom::ElementNode *castToElement = dynamic_cast<dom::ElementNode *>(node);
-    raw_data_ = castToElement->getAttr(constants::html_attributes::SRC, "/");
+    dom::ElementNode &castToElement = dynamic_cast<dom::ElementNode &>(node);
+    raw_data_ = castToElement.getAttr(constants::html_attributes::SRC, "/");
   }
 }
 

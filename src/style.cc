@@ -67,17 +67,17 @@ DisplayType StyledNode::get_display_type() const {
 }
 
 std::string StyledNode::get_tag() const {
-  dom::ElementNode *castToElement = dynamic_cast<dom::ElementNode *>(node_);
-  bool isElement = castToElement == node_;
-  if (isElement) {
-    return castToElement->get_tag();
-  } else {
+  dom::Node &node = get_node();
+  try {
+    dom::ElementNode &castToElement = dynamic_cast<dom::ElementNode &>(node);
+    return castToElement.get_tag();
+  } catch (const std::bad_cast &e) {
     return constants::html_tags::TEXT;
   }
 }
 
 void StyledNode::log() const {
-  std::string log_str = "\n Node: " + node_->toLogStr() + "\n Styles: \n";
+  std::string log_str = "\n Node: " + get_node().toLogStr() + "\n Styles: \n";
   for (auto it = style_values_.cbegin(); it != style_values_.cend(); ++it) {
     log_str += "\t" + it->first + ": " + it->second + "\n";
   }
@@ -261,32 +261,28 @@ PropertyMap getElementStyleValues(
 
 // Construct a tree of StyledNodes from a DOM tree + StyleSheet
 std::unique_ptr<StyledNode> styleTree(
-    dom::Node *root, const std::unique_ptr<css::StyleSheet const> &css,
+    dom::Node &root, const std::unique_ptr<css::StyleSheet const> &css,
     PropertyMap parentStyles) {
   std::unique_ptr<StyledNode> s;
   std::vector<std::unique_ptr<StyledNode>> children;
-  dom::ElementNode *castToElement;
-  dom::TextNode *castToText;
-  // Determine if this is an element node, and recursively apply styles
-  castToElement = dynamic_cast<dom::ElementNode *>(root);
-  castToText = dynamic_cast<dom::TextNode *>(root);
-  bool isElement = castToElement == root;
   PropertyMap styles;
-  if (isElement) {
-    dom::ElementNode *elementNode = new dom::ElementNode(*castToElement);
-    if (!elementNode->isDisplayable()) {
+  try {
+    // Determine if this is an element node, and recursively apply styles
+    dom::ElementNode &castToElement = dynamic_cast<dom::ElementNode &>(root);
+    if (!castToElement.isDisplayable()) {
       s.reset(new StyledNode(castToElement, styles, std::move(children)));
 
     } else {
-      styles = getElementStyleValues(elementNode, css, parentStyles);
-      for (auto nodeChild : elementNode->get_children()) {
+      styles = getElementStyleValues(&castToElement, css, parentStyles);
+      for (auto nodeChild : castToElement.get_children()) {
         std::unique_ptr<StyledNode> styledChild =
             styleTree(nodeChild, css, styles);
         children.push_back(std::move(styledChild));
       }
       s.reset(new StyledNode(castToElement, styles, std::move(children)));
     }
-  } else {
+  } catch (const std::bad_cast &e) {
+    dom::TextNode &castToText = dynamic_cast<dom::TextNode &>(root);
     styles = getTextStyleValues(parentStyles);
     s.reset(new StyledNode(castToText, styles, std::move(children)));
   }

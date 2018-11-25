@@ -30,18 +30,18 @@ enum DisplayType {
  * Cascading of styles is applied.
  */
 class StyledNode {
-  dom::Node *node_;
+  dom::Node &node_;
   PropertyMap style_values_;
   std::vector<std::unique_ptr<StyledNode>> children_;
 
  public:
-  StyledNode(dom::Node *node, PropertyMap style_values,
-             std::vector<std::unique_ptr<StyledNode>> children) {
-    node_ = node;
+  StyledNode(dom::Node &node, PropertyMap style_values,
+             std::vector<std::unique_ptr<StyledNode>> children)
+      : node_(node) {
     style_values_ = style_values;
     children_ = std::move(children);
   };
-  dom::Node *get_node() const { return node_; }
+  dom::Node &get_node() const { return node_; }
   std::vector<std::reference_wrapper<StyledNode>> get_children() const {
     std::vector<std::reference_wrapper<StyledNode>> children;
     for (auto const &child : children_) {
@@ -59,7 +59,7 @@ std::string getValue(const PropertyMap style_value, const std::string &property,
                      const std::string &default_value = constants::DEFAULT);
 
 std::unique_ptr<StyledNode> styleTree(
-    dom::Node *root, const std::unique_ptr<css::StyleSheet const> &css,
+    dom::Node &root, const std::unique_ptr<css::StyleSheet const> &css,
     PropertyMap parentStyles);
 }  // namespace style
 #endif

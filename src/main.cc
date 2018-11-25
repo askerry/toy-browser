@@ -76,14 +76,14 @@ int main(int argc, char **argv) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
   const std::string source = io::readFile(FLAGS_html_file);
-  dom::Node *root = html_parser::parseHtml(source);
+  std::unique_ptr<dom::Node> root = html_parser::parseHtml(source);
   const std::string css = io::readFile(FLAGS_css_file);
   const std::unique_ptr<css::StyleSheet const> stylesheet = css::parseCss(css);
   style::PropertyMap pm;
   text_render::FontRegistry *registry =
       text_render::FontRegistry::getInstance();
   std::unique_ptr<style::StyledNode> sn =
-      style::styleTree(root, stylesheet, pm);
+      style::styleTree(*root, stylesheet, pm);
   windowLoop(*sn);
   registry->clear();
   return 0;
