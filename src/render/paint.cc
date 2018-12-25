@@ -50,10 +50,10 @@ void Renderer::renderShape(const layout::LayoutElement &box,
   int borderRadius = std::stoi(
       box.getStyleValue(constants::css_properties::BORDER_RADIUS, "0"));
   sf::Color b_color = getColor(box, constants::css_properties::BORDER_COLOR);
-  RenderShape command1("Border", box.dimensions.borderBox(), b_color,
+  RenderShape command_inner("Border", box.dimensions.borderBox(), b_color,
                        borderRadius);
-  command1.paint(window);
-  command1.log();
+  command_inner.paint(window);
+  command_inner.log();
 
   sf::Color bg_color =
       getColor(box, constants::css_properties::BACKGROUND_COLOR);

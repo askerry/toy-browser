@@ -98,9 +98,6 @@ FontRegistry *FontRegistry::getInstance() {
 }
 void FontRegistry::clear() {
   logger::info("Clearing font registry");
-  for (auto const &it : fonts_) {
-    // delete it.second;
-  }
   fonts_.clear();
 }
 }  // namespace text_render

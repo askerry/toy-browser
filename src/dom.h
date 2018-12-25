@@ -24,6 +24,7 @@ class Node {
   Node(std::vector<std::unique_ptr<Node>> children) {
     children_ = std::move(children);
   };
+  virtual ~Node() {}
   // Delete copy constructor
   Node(const Node &node) = delete;
   Node &operator=(const Node &node) = delete;

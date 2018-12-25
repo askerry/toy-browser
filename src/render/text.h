@@ -15,7 +15,7 @@ class FontRegistry {
   // constuctors and assignment operations private so they can't be called
   FontRegistry() {}
   FontRegistry(FontRegistry const&){};
-  FontRegistry& operator=(FontRegistry const&){};
+  FontRegistry& operator=(FontRegistry const&);
 
  public:
   const sf::Font& load(std::string fontName);
