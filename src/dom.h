@@ -1,3 +1,5 @@
+// Classes for representing a DOM hierarchy.
+
 #ifndef DOM_H
 #define DOM_H
 
@@ -11,15 +13,12 @@ typedef std::map<std::string, std::string> Attrs;
 
 namespace dom {
 
-/*
- * Represents a node in the DOM tree. Can be either TextNode or ElementNode.
- */
+// Represents a node in the DOM tree. Can be either TextNode or ElementNode.
 class Node {
  private:
   std::vector<std::unique_ptr<Node>> children_;
 
  public:
-  // Constructors
   Node(){};
   Node(std::vector<std::unique_ptr<Node>> children) {
     children_ = std::move(children);
@@ -29,76 +28,62 @@ class Node {
   Node(const Node &node) = delete;
   Node &operator=(const Node &node) = delete;
 
-  // Getters
   std::vector<std::reference_wrapper<Node>> get_children() const {
     std::vector<std::reference_wrapper<Node>> children;
-    for (auto const &child : children_) {
+    for (const auto &child : children_) {
       children.push_back(*child);
     }
     return children;
   };
 
-  virtual std::string toLogStr() const { return ""; };
+  virtual std::string toLogStr() const = 0;
 };
 
-/*
- * Represents raw text.
- */
+// Represents a raw text node.
 class TextNode : public Node {
-  std::string text_;
+  const std::string text_;
 
  public:
-  // Constructors
   // Delete copy constructor
   TextNode(const TextNode &node) = delete;
-  TextNode(const std::string &text) { text_ = text; }
-  TextNode(const std::string &text, std::vector<std::unique_ptr<Node>> children)
-      : Node(std::move(children)) {
-    text_ = text;
-  }
-  // Getters
+  TextNode(std::string text) : text_(std::move(text)) {}
+  TextNode(std::string text, std::vector<std::unique_ptr<Node>> children)
+      : Node(std::move(children)), text_(std::move(text)) {}
   std::string get_text() const { return text_; }
 
-  std::string toLogStr() const;
+  std::string toLogStr() const override;
 };
 
-/*
- * Represents any non-text node of the DOM.
- */
+// Represents any non-text node of the DOM.
 class ElementNode : public Node {
  private:
-  std::string tag_name_;
-  std::map<std::string, std::string> attrs_;
+  const std::string tag_name_;
+  const std::map<std::string, std::string> attrs_;
 
  public:
-  // Constructors
   ElementNode(const ElementNode &node) = delete;
 
-  ElementNode(const std::string &tag_name, Attrs attrs) {
-    tag_name_ = tag_name;
-    attrs_ = attrs;
-  };
-  ElementNode(const std::string &tag_name, Attrs attrs,
+  ElementNode(std::string tag_name, Attrs attrs)
+      : tag_name_(std::move(tag_name)), attrs_(std::move(attrs)){};
+  ElementNode(std::string tag_name, Attrs attrs,
               std::vector<std::unique_ptr<Node>> children)
-      : Node(std::move(children)) {
-    tag_name_ = tag_name;
-    attrs_ = attrs;
-  };
+      : Node(std::move(children)),
+        tag_name_(std::move(tag_name)),
+        attrs_(std::move(attrs)){};
 
-  // Getters
   std::string get_id() const;
   std::string get_tag() const { return tag_name_; };
   std::vector<std::string> get_classes() const;
 
   // Returns whether this node is one that is displayed to the screen,
-  // or something like <head>, <meta> that are used for metadata only
+  // or something like <head>, <meta> that are used for metadata only.
   bool isDisplayable() const;
   // Return the provided attribute. Returns the provided default_value
-  // if the attribute is not present.
+  // if the attribute is not present in attrs_.
   std::string getAttr(
       const std::string &property,
       const std::string &default_value = constants::DEFAULT) const;
-  std::string toLogStr() const;
+  std::string toLogStr() const override;
 };
 
 }  // namespace dom

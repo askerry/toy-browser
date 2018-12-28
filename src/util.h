@@ -1,3 +1,5 @@
+// Miscellaneous utilities
+
 #ifndef B_UTIL_H
 #define B_UTIL_H
 

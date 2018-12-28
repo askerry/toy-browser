@@ -5,6 +5,9 @@
 
 #include "constants.h"
 
+namespace color {
+
+namespace {
 std::map<std::string, std::string> COLOR_KEYWORDS{
     {"WHITE", "#FFFFFF"},   {"BLACK", "#000000"},  {"RED", "#FF0000"},
     {"LIME", "#00FF00"},    {"GREEN", "#008000"},  {"BLUE", "#0000FF"},
@@ -45,7 +48,7 @@ int hexadecimalToDecimal(char hexVal[]) {
   return dec_val;
 }
 
-// If provided color is a color keyword, converts to hex
+// If provided color matches a color keyword, convert to hex
 std::string maybeParseColorKeywords(const std::string& colorStr) {
   if (COLOR_KEYWORDS.find(colorStr) != COLOR_KEYWORDS.end()) {
     return COLOR_KEYWORDS[colorStr];
@@ -54,8 +57,8 @@ std::string maybeParseColorKeywords(const std::string& colorStr) {
   }
 }
 
-// Converts an `rgb(R, G, B)` string to an rgb Color instance
-sf::Color parse_rgb(const std::string& colorStr) {
+// Converts an `rgb(R,G,B)` string to an rgb Color instance
+sf::Color parseRgb(const std::string& colorStr) {
   sf::Color rgb;
   std::vector<std::string> values =
       absl::StrSplit(colorStr.substr(4, colorStr.size() - 5), ',');
@@ -65,7 +68,7 @@ sf::Color parse_rgb(const std::string& colorStr) {
   rgb.a = 255;
   return rgb;
 }
-
+}  // namespace
 // Parses a CSS color value (hex, rgb or name) into a Color instance
 sf::Color parseColor(std::string colorStr) {
   colorStr = absl::AsciiStrToUpper(colorStr);
@@ -77,7 +80,7 @@ sf::Color parseColor(std::string colorStr) {
   }
   colorStr = maybeParseColorKeywords(colorStr);
   if (colorStr.substr(0, 3) == "RGB") {
-    return parse_rgb(colorStr);
+    return parseRgb(colorStr);
   }
   assert(colorStr[0] == '#');
   // If it's an abbreviated hex style, expand it
@@ -104,7 +107,6 @@ sf::Color parseColor(std::string colorStr) {
   rgb.a = hexadecimalToDecimal(a_pair);
   return rgb;
 }
-
 // Extract the specified color value for the element
 sf::Color getColor(const layout::LayoutElement& box,
                    const std::string& colorType) {
@@ -115,3 +117,4 @@ sf::Color getColor(const layout::LayoutElement& box,
   sf::Color color = parseColor(c);
   return color;
 }
+}  // namespace color

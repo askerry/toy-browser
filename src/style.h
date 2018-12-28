@@ -25,10 +25,8 @@ enum DisplayType {
   Invisible
 };
 
-/*
- * Represents a DOM node paired with the styles that apply to it.
- * Cascading of styles is applied.
- */
+// Represents a DOM node paired with the styles that apply to it.
+// Cascading of styles is applied
 class StyledNode {
   dom::Node &node_;
   PropertyMap style_values_;
@@ -37,10 +35,9 @@ class StyledNode {
  public:
   StyledNode(dom::Node &node, PropertyMap style_values,
              std::vector<std::unique_ptr<StyledNode>> children)
-      : node_(node) {
-    style_values_ = style_values;
-    children_ = std::move(children);
-  };
+      : node_(node),
+        style_values_(style_values),
+        children_(std::move(children)){};
   dom::Node &get_node() const { return node_; }
   std::vector<std::reference_wrapper<StyledNode>> get_children() const {
     std::vector<std::reference_wrapper<StyledNode>> children;

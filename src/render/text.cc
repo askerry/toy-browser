@@ -6,15 +6,27 @@
 #include "../constants.h"
 #include "../util.h"
 
+namespace text_render {
+
+namespace {
+
 const std::string DEFAULT_FONT = "14";
 const std::string DEFAULT_TEXT_COLOR = "#000000";
 const std::string DEFAULT_STYLE = "normal";
 const float DEFAULT_LINE_HEIGHT = 1.2;
 
+std::unique_ptr<sf::Font> loadFont(const std::string &fontName) {
+  std::unique_ptr<sf::Font> font(new sf::Font);
+  if (!font->loadFromFile("fonts/" + fontName + ".ttf")) {
+    logger::error("Unable to load font: " + fontName);
+  }
+  return font;
+}
+
 sf::Color getTextColor(layout::LayoutElement *element) {
   std::string c = element->getStyleValue(constants::css_properties::COLOR,
                                          DEFAULT_TEXT_COLOR);
-  sf::Color color = parseColor(c);
+  sf::Color color = color::parseColor(c);
   return color;
 }
 
@@ -42,16 +54,7 @@ sf::Uint32 getStyle(layout::LayoutElement *element) {
   }
   return textStyle;
 }
-
-std::unique_ptr<sf::Font> loadFont(const std::string &fontName) {
-  std::unique_ptr<sf::Font> font(new sf::Font);
-  if (!font->loadFromFile("fonts/" + fontName + ".ttf")) {
-    logger::error("Unable to load font: " + fontName);
-  }
-  return font;
-}
-
-namespace text_render {
+}  // namespace
 
 int getTextWidth(layout::LayoutElement *element) {
   sf::FloatRect rect = element->get_text_node().getGlobalBounds();
@@ -81,9 +84,9 @@ std::unique_ptr<sf::Text> constructText(layout::LayoutElement *element,
 }
 
 // Global static pointer to font registry
-FontRegistry *FontRegistry::instance_ = NULL;
+FontRegistry *FontRegistry::instance_ = nullptr;
 
-const sf::Font &FontRegistry::load(std::string fontName) {
+const sf::Font &FontRegistry::load(const std::string &fontName) {
   if (fonts_.find(fontName) == fonts_.end()) {
     fonts_[fontName] = loadFont(fontName);
   }
@@ -91,7 +94,7 @@ const sf::Font &FontRegistry::load(std::string fontName) {
 }
 
 FontRegistry *FontRegistry::getInstance() {
-  if (!instance_) {
+  if (instance_ == nullptr) {
     instance_ = new FontRegistry;
   }
   return instance_;

@@ -1,3 +1,5 @@
+// Classes for representing a DOM hierarchy.
+
 #include "dom.h"
 
 #include <iostream>
@@ -34,10 +36,11 @@ std::string ElementNode::get_id() const {
 
 std::string ElementNode::getAttr(const std::string &attribute,
                                  const std::string &default_value) const {
-  if (attrs_.find(attribute) == attrs_.end()) {
+  auto it = attrs_.find(attribute);
+  if (it == attrs_.end()) {
     return default_value;
   }
-  return attrs_.at(attribute);
+  return it->second;
 }
 
 bool ElementNode::isDisplayable() const {

@@ -1,3 +1,5 @@
+// Module for parsing a CSS source string.
+
 #ifndef CSS_H
 #define CSS_H
 

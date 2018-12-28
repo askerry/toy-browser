@@ -1,4 +1,7 @@
+// Module for parsing a CSS source string.
+
 #include "css.h"
+
 #include <tuple>
 
 #include "absl/strings/ascii.h"
@@ -7,11 +10,13 @@
 #include "../constants.h"
 #include "../util.h"
 
+namespace css {
+
+namespace {
 bool validSelectorChar(char c) { return c != '{' && c != '/' && c != ' '; }
 bool validPropertyChar(char c) { return isalnum(c) || c == '-' || c == '_'; }
 bool validValueChar(char c) { return c != ';' && c != '}'; }
-
-namespace css {
+}  // namespace
 
 std::vector<Rule> getDefaultTagRules() {
   std::vector<Rule> rules;

@@ -35,7 +35,7 @@ void Renderer::renderLayout(layout::LayoutElement &box,
 }
 void Renderer::renderBullet(const layout::LayoutElement &box,
                             sf::RenderWindow *window) {
-  sf::Color color = getColor(box, constants::css_properties::COLOR);
+  sf::Color color = color::getColor(box, constants::css_properties::COLOR);
   layout::Rect r = box.dimensions.paddingBox();
   layout::Rect bullet_rect;
   bullet_rect.x = r.x;
@@ -49,14 +49,15 @@ void Renderer::renderShape(const layout::LayoutElement &box,
                            sf::RenderWindow *window) {
   int borderRadius = std::stoi(
       box.getStyleValue(constants::css_properties::BORDER_RADIUS, "0"));
-  sf::Color b_color = getColor(box, constants::css_properties::BORDER_COLOR);
+  sf::Color b_color =
+      color::getColor(box, constants::css_properties::BORDER_COLOR);
   RenderShape command_inner("Border", box.dimensions.borderBox(), b_color,
-                       borderRadius);
+                            borderRadius);
   command_inner.paint(window);
   command_inner.log();
 
   sf::Color bg_color =
-      getColor(box, constants::css_properties::BACKGROUND_COLOR);
+      color::getColor(box, constants::css_properties::BACKGROUND_COLOR);
   RenderShape command("Rect", box.dimensions.paddingBox(), bg_color,
                       borderRadius);
   command.paint(window);
@@ -68,7 +69,8 @@ void Renderer::renderImage(const layout::LayoutElement &box,
 }
 void Renderer::renderText(layout::LayoutElement &box,
                           sf::RenderWindow *window) {
-  sf::Color color = getColor(box, constants::css_properties::BACKGROUND_COLOR);
+  sf::Color color =
+      color::getColor(box, constants::css_properties::BACKGROUND_COLOR);
   RenderText command("Text", box.dimensions.borderBox(), color,
                      box.take_text_node(), box.get_raw_data());
   command.paint(window);
@@ -113,7 +115,7 @@ void RenderText::log() {
   std::string str = "Command= " + command_type_ + ": ";
   str += "'" + raw_text_ + "'";
   str += RenderCommand::coords();
-  str += displayColor(color_);
+  str += color::toLogStr(color_);
   logger::info(str);
 }
 
@@ -127,7 +129,7 @@ void RenderImage::log() {
 void RenderShape::log() {
   std::string str = "Command= " + command_type_ + ": ";
   str += RenderCommand::coords();
-  str += displayColor(color_);
+  str += color::toLogStr(color_);
   logger::info(str);
 }
 

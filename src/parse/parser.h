@@ -1,12 +1,12 @@
+// Base class for implementing HTML and CSS parsers.
+
 #ifndef PARSER_H
 #define PARSER_H
 
 #include <functional>
 #include <iostream>
 
-/*
- * A base parser used for HTML and CSS parsing.
- */
+// A base parser used for HTML and CSS parsing.
 class BaseParser {
  private:
   int pos_;
@@ -25,7 +25,7 @@ class BaseParser {
   // Return true if all input has been consumed.
   bool endOfInput();
 
-  // Consumes the next character
+  // Consumes and returns the next character
   char consumeChar();
 
   // Consumes until the next non-whitespace character
@@ -35,10 +35,8 @@ class BaseParser {
   std::string consumeWhile(std::function<bool(char)> condition);
 
  public:
-  BaseParser(int pos, std::string input) {
-    pos_ = pos;
-    input_ = input;
-  };
+  BaseParser(int pos, std::string input)
+      : pos_(pos), input_(std::move(input)){};
 };
 
 #endif

@@ -9,19 +9,24 @@
 #include "../layout.h"
 
 namespace text_render {
+
+// Registry singleton for SFML fonts
 class FontRegistry {
   std::map<std::string, std::unique_ptr<sf::Font>> fonts_;
   static FontRegistry* instance_;
-  // constuctors and assignment operations private so they can't be called
+  // Make default constuctor private so it can't be called
   FontRegistry() {}
-  FontRegistry(FontRegistry const&){};
-  FontRegistry& operator=(FontRegistry const&);
+
+  // Delete copy constructor and copy assignment operator
+  FontRegistry(const FontRegistry&) = delete;
+  FontRegistry& operator=(const FontRegistry&) = delete;
 
  public:
-  const sf::Font& load(std::string fontName);
+  const sf::Font& load(const std::string& fontName);
   static FontRegistry* getInstance();
   void clear();
 };
+
 int getTextHeight(layout::LayoutElement* element);
 int getTextWidth(layout::LayoutElement* element);
 std::unique_ptr<sf::Text> constructText(layout::LayoutElement* element,
